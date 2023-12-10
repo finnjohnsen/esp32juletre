@@ -1,5 +1,4 @@
 #include "Arduino.h"
-#include "easing.h"
 #include <FastLED.h>
 #include <sstream>
 #include "ota.h"
