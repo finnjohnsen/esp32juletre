@@ -13,7 +13,9 @@ void setup()
     Serial.begin(9600);
     Serial.println("Starter");
     FastLED.addLeds<WS2812B, LED_STRIP1_PIN, GRB>(leds, NUM_LEDS);
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, 200);
+    //FastLED.setMaxPowerInVoltsAndMilliamps(5, 2500);
+    FastLED.setBrightness(200);
+    FastLED.setCorrection(TypicalPixelString);
     //FastLED.setCorrection(UncorrectedColor);
 
     OTA::setup();
@@ -21,23 +23,37 @@ void setup()
 }
 
 int cycle = 0;
-void loop()
-{
 
-    EVERY_N_MILLISECONDS (30000) {
-        cycle = ++cycle % 4;
-        CRGB newColor = CRGB::Green;
-        switch(cycle) {
-            case 1: newColor = CRGB::Red; break;
-            case 2: newColor = CRGB::Blue; break;
-            case 3: newColor = CRGB::Yellow; break;
-            case 4: newColor = CRGB::Purple; break;
-            case 5: newColor = CRGB::CornflowerBlue; break;
-            default: newColor = CRGB::White; break;
-            }
-        for(int i = 0; i < NUM_LEDS; i++) { leds[i] = newColor; }
-            FastLED.show();
+void fillEvent() {
+    CRGB newColor = CRGB::White;
+    switch(cycle) {
+        case 1: newColor = CRGB::White; break;
+        case 2: newColor = CRGB::Pink; break;
+        case 3: newColor = CRGB::DeepPink; break;
+        case 4: newColor = CRGB::DarkGreen; break;
+        case 5: newColor = CRGB::DarkSlateBlue; break;
+        default: cycle = 0; break;
+    }
+    for(int i = 0; i < NUM_LEDS; i++) { leds[i] = newColor; }
+    cycle = (++cycle % 6);
+    FastLED.show();
+}
 
+boolean firstRun = true;
+void loop() {
+
+    if (firstRun) { 
+        firstRun = false;
+        fillEvent(); 
+    }
+
+    EVERY_N_MILLISECONDS (10000) {
+        fillEvent();
+    }
+
+    EVERY_N_MILLIS(150) {
+        fadeToBlackBy(leds, NUM_LEDS, 10);
+        FastLED.show();
     }
 
     EVERY_N_MILLIS(100) {
